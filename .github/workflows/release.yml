@@ -1,0 +1,59 @@
+name: Publish Dalamud repository
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Dalamud API files
+        shell: pwsh
+        run: |
+          $dalamudDir = Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev'
+          New-Item -ItemType Directory -Force -Path $dalamudDir | Out-Null
+          Invoke-WebRequest -Uri 'https://goatcorp.github.io/dalamud-distrib/latest.zip' -OutFile .\dalamud.zip
+          Expand-Archive -Path .\dalamud.zip -DestinationPath $dalamudDir -Force
+
+      - name: Restore packages
+        run: dotnet restore .\TugOfWar.csproj --locked-mode
+
+      - name: Build release package
+        run: dotnet build .\TugOfWar.csproj --configuration Release --no-restore
+
+      - name: Run checks
+        run: dotnet run --project .\tests\TugOfWarChecks.csproj
+
+      - name: Create repository feed
+        shell: pwsh
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          .\.github\scripts\GeneratePluginmaster.ps1 -Tag $env:GITHUB_REF_NAME
+
+      - name: Publish GitHub release and plugin repository feed
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $packagePath = '.\dist\dev\TugOfWar\latest.zip'
+          gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag $packagePath .\pluginmaster.json --clobber --repo $env:GITHUB_REPOSITORY
+          } else {
+            gh release create $tag $packagePath .\pluginmaster.json --title "Tug of War $tag" --generate-notes --latest --repo $env:GITHUB_REPOSITORY
+          }
+          if ($LASTEXITCODE -ne 0) {
+            throw "Failed to publish release $tag."
+          }

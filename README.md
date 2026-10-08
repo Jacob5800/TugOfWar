@@ -32,6 +32,16 @@ dotnet run --project .\tests\TugOfWarChecks.csproj
 
 The plugin build writes to `dist/dev`. Add `dist/dev/TugOfWar.dll` in Dalamud Settings → Experimental → Dev Plugin Locations and scan, or use an existing registered location with automatic reload enabled.
 
+## Install with Dalamud
+
+In the Dalamud Plugin Installer (`/xlplugins`), open **Settings → Experimental → Custom Plugin Repositories** and add:
+
+```text
+https://github.com/Jacob5800/TugOfWar/releases/latest/download/pluginmaster.json
+```
+
+The repository feed and installable package are published automatically when a version tag is pushed. Use the four-part assembly version from `TugOfWar.json` for the tag (for example, `v0.1.0.0`).
+
 ## License
 
 The original project content is © 2026 Jacob5800 and is provided for viewing on GitHub only. See [LICENSE](LICENSE) for reuse restrictions. Third-party dependencies remain subject to their own licenses.

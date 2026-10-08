@@ -1,0 +1,45 @@
+name: Build plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Dalamud API files
+        shell: pwsh
+        run: |
+          $dalamudDir = Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev'
+          New-Item -ItemType Directory -Force -Path $dalamudDir | Out-Null
+          Invoke-WebRequest -Uri 'https://goatcorp.github.io/dalamud-distrib/latest.zip' -OutFile .\dalamud.zip
+          Expand-Archive -Path .\dalamud.zip -DestinationPath $dalamudDir -Force
+
+      - name: Restore packages
+        run: dotnet restore .\TugOfWar.csproj --locked-mode
+
+      - name: Build release package
+        run: dotnet build .\TugOfWar.csproj --configuration Release --no-restore
+
+      - name: Run checks
+        run: dotnet run --project .\tests\TugOfWarChecks.csproj
+
+      - name: Verify Dalamud package exists
+        shell: pwsh
+        run: |
+          $package = '.\dist\dev\TugOfWar\latest.zip'
+          if (-not (Test-Path $package)) {
+            throw "DalamudPackager did not create $package"
+          }

@@ -5,6 +5,7 @@
   "AssemblyVersion": "0.1.0.0",
   "Description": "Track Tug of War scores from /random 100 rolls.",
   "ApplicableVersion": "any",
+  "RepoUrl": "https://github.com/Jacob5800/TugOfWar",
   "Tags": ["random", "roll", "score", "party", "game"],
   "DalamudApiLevel": 15,
   "LoadRequiredState": 0,
