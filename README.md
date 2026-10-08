@@ -5,6 +5,7 @@ A small Dalamud API 15 plugin for running the Tug of War dice game in FFXIV. It 
 ## Features
 
 - Separate character lists for each team; team sizes do not need to match.
+- Import the current party roster, assign members to either team, and apply the assignments while preserving names outside that party.
 - One accepted roll per team per turn, from any listed member.
 - The higher roll gains one point. The other team loses one point if its score is above zero.
 - Ties clear both rolls and let the teams reroll without changing the score.
@@ -15,7 +16,7 @@ A small Dalamud API 15 plugin for running the Tug of War dice game in FFXIV. It 
 ## Use in game
 
 1. Open the plugin with `/tugofwar`.
-2. Set the team names and add one character name per roster line. Commas and semicolons also separate names. `Forename Surname@World` is accepted; world names are ignored when matching the roll sender.
+2. Set the team names and add one character name per roster line, or expand **Import current party**, refresh the party roster, assign each member to Team A, Team B, or Skip, and apply. Applying replaces team assignments for members in that party snapshot while preserving other roster names. Commas and semicolons also separate manually entered names. `Forename Surname@World` is accepted; world names are ignored when matching the roll sender.
 3. Enable **Announce match and resolved scores in party chat** only if you want the plugin to post automatically.
 4. Choose **Start / reset match**. Players use `/random 100` in game. The first listed player from each team to roll is recorded for that turn.
 

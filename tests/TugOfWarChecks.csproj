@@ -7,5 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\MatchEngine.cs" Link="MatchEngine.cs" />
+    <Compile Include="..\PartyRosterImporter.cs" Link="PartyRosterImporter.cs" />
   </ItemGroup>
 </Project>

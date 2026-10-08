@@ -148,13 +148,13 @@ internal sealed class MatchEngine
         return value is >= 1 and <= 100;
     }
 
-    private static HashSet<string> ParseRoster(string text) => text
+    internal static HashSet<string> ParseRoster(string text) => text
         .Split(['\r', '\n', ',', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(NormalizePlayerName)
         .Where(name => name.Length > 0)
         .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-    private static string NormalizePlayerName(string name)
+    internal static string NormalizePlayerName(string name)
     {
         var normalized = name.Trim();
         var worldSeparator = normalized.LastIndexOf('@');

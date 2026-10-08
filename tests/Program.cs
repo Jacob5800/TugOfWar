@@ -44,4 +44,14 @@ Check(!MatchEngine.TryReadRandom100("rolls 75 (out of 200)", out _), "Parser sho
 Check(!MatchEngine.TryReadRandom100("rolls 75", out _), "Parser should reject a result that does not identify its maximum.");
 Check(!MatchEngine.TryReadRandom100("Mimi rolls 0 (out of 100)", out _), "Parser should reject roll zero.");
 
+var imported = PartyRosterImporter.Apply("Mimi\nAless\nSolo guest", "Raine\nNana", [
+    new PartyRosterAssignment("Aless", TeamSide.B),
+    new PartyRosterAssignment("Raine", null),
+    new PartyRosterAssignment("New member", TeamSide.A),
+]);
+Check(imported.TeamA == $"Mimi{Environment.NewLine}Solo guest{Environment.NewLine}New member",
+    "Party assignment should preserve outside-party Team A names and add newly assigned members.");
+Check(imported.TeamB == $"Nana{Environment.NewLine}Aless",
+    "Party assignment should move a party member between teams and omit skipped members.");
+
 Console.WriteLine("Tug of War checks passed.");

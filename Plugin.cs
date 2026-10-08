@@ -13,21 +13,23 @@ public sealed class Plugin : IDalamudPlugin
     private readonly IDalamudPluginInterface pluginInterface;
     private readonly ICommandManager commandManager;
     private readonly IChatGui chatGui;
+    private readonly IPartyList partyList;
     private readonly IPluginLog log;
     private readonly WindowSystem windowSystem = new("TugOfWar");
     private readonly MatchEngine engine = new();
     private readonly TugOfWarWindow mainWindow;
 
     public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commandManager,
-        IChatGui chatGui, IPluginLog log)
+        IChatGui chatGui, IPartyList partyList, IPluginLog log)
     {
         this.pluginInterface = pluginInterface;
         this.commandManager = commandManager;
         this.chatGui = chatGui;
+        this.partyList = partyList;
         this.log = log;
 
         var config = pluginInterface.GetPluginConfig() as TugOfWarConfig ?? new TugOfWarConfig();
-        mainWindow = new TugOfWarWindow(config, engine, StartMatch, OnOutcome, SaveConfig);
+        mainWindow = new TugOfWarWindow(config, engine, StartMatch, OnOutcome, SaveConfig, ReadPartyMembers);
         windowSystem.AddWindow(mainWindow);
 
         pluginInterface.UiBuilder.Draw += windowSystem.Draw;
@@ -52,6 +54,20 @@ public sealed class Plugin : IDalamudPlugin
 
     private void ToggleWindow() => mainWindow.Toggle();
     private void SaveConfig() => pluginInterface.SavePluginConfig(mainWindow.Config);
+
+    private IReadOnlyList<string> ReadPartyMembers()
+    {
+        var names = new List<string>(partyList.Length);
+        for (var i = 0; i < partyList.Length; i++)
+        {
+            var member = partyList[i];
+            if (member is null) continue;
+            var name = member.Name.TextValue.Trim();
+            if (name.Length > 0) names.Add(name);
+        }
+
+        return names;
+    }
 
     private void StartMatch()
     {
