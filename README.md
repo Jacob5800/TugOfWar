@@ -1,0 +1,43 @@
+# Tug of War
+
+A small Dalamud API 15 plugin for running the Tug of War dice game in FFXIV. It reads `/random 100` results from game chat, maps the roller to one of two independently sized team rosters, and tracks the score.
+
+## Features
+
+- Separate character lists for each team; team sizes do not need to match.
+- One accepted roll per team per turn, from any listed member.
+- The higher roll gains one point. The other team loses one point if its score is above zero.
+- Ties clear both rolls and let the teams reroll without changing the score.
+- The first team to 3 points wins.
+- Optional party-chat announcements for match start, resolved turns, ties, and the winner.
+- Manual roll entry for a result the chat parser does not recognize.
+
+## Use in game
+
+1. Open the plugin with `/tugofwar`.
+2. Set the team names and add one character name per roster line. Commas and semicolons also separate names. `Forename Surname@World` is accepted; world names are ignored when matching the roll sender.
+3. Enable **Announce match and resolved scores in party chat** only if you want the plugin to post automatically.
+4. Choose **Start / reset match**. Players use `/random 100` in game. The first listed player from each team to roll is recorded for that turn.
+
+The plugin ignores players who are not listed. If a team has already rolled that turn, another roll from that team is ignored. A score cannot go below zero.
+
+## Build
+
+Requires the local Dalamud API 15 SDK and .NET SDK used by that install.
+
+```powershell
+dotnet build .\TugOfWar.csproj
+dotnet run --project .\tests\TugOfWarChecks.csproj
+```
+
+The plugin build writes to `dist/dev`. Add `dist/dev/TugOfWar.dll` in Dalamud Settings → Experimental → Dev Plugin Locations and scan, or use an existing registered location with automatic reload enabled.
+
+## License
+
+The original project content is © 2026 Jacob5800 and is provided for viewing on GitHub only. See [LICENSE](LICENSE) for reuse restrictions. Third-party dependencies remain subject to their own licenses.
+
+## Chat parsing
+
+Rolls are matched by sender name and the `/random 100` result text. The expected maximum must be present and equal to 100, which prevents a smaller `/random` roll from scoring accidentally. If the game language or roll text differs, enter the result through the manual entry fields.
+
+Party announcements are opt-in and sent using the game's party-chat command. Without that setting, scores are shown in the plugin window and tie/win results are also printed locally.
